@@ -1,12 +1,10 @@
 import mongoose from "mongoose";
 
+const dburi: string = process.env.MONGO_URI || "mongodb://localhost:27017/real-notif";
 // Database connection
-export const connectDB = async () => {
+export const connectDB = async (): Promise<void> => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(dburi);
     console.log("MongoDB connected successfully");
   } catch (error) {
     console.error("MongoDB connection failed:", error);
@@ -14,13 +12,15 @@ export const connectDB = async () => {
   }
 };
 
+
+
 // User schema
 const userSchema = new mongoose.Schema({
   id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     index: true,
-    default: function () {
+    default: function (this: any) {
       return this._id;
     },
   },
@@ -57,7 +57,7 @@ const channelSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Channel",
     index: true,
-    default: function () {
+    default: function (this: any) {
       return this._id;
     },
   },
@@ -98,7 +98,7 @@ const newsSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "News",
     index: true,
-    default: function () {
+    default: function (this: any) {
       return this._id;
     },
   },

@@ -2,6 +2,7 @@ import http from "http";
 import express from "express";
 import { setupWebSocket } from "./sockets/ws";
 import { initRedis } from "./config/redis";
+import { connectDB } from "./database/schema";
 import cors from "cors";
 import router from "./routes/publish";
 
@@ -18,6 +19,13 @@ app.get("/", (req, res) => {
 setupWebSocket(server);
 initRedis().catch((error) => {
   console.error("Failed to initialize Redis:", error);
+  process.exit(1);
+});
+
+connectDB().then(() => {
+  console.log("Connected to MongoDB");
+}).catch((e:Error) => {
+  console.error("Failed to connect to MongoDB:", e);
   process.exit(1);
 });
 
