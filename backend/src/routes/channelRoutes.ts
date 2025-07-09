@@ -95,7 +95,7 @@ const deleteChannel = async (channelId: string): Promise<boolean> => {
 };
 
 const subscribeToChannel = async (
-  userId: string, 
+  userId: string,
   channelId: string
 ): Promise<boolean> => {
   const session = await mongoose.startSession();
@@ -128,7 +128,7 @@ const subscribeToChannel = async (
 };
 
 const unsubscribeFromChannel = async (
-  userId: string, 
+  userId: string,
   channelId: string
 ): Promise<boolean> => {
   const session = await mongoose.startSession();
@@ -160,3 +160,11 @@ const unsubscribeFromChannel = async (
   }
 };
 
+export {
+  createChannel,
+  getChannel,
+  updateChannel,
+  deleteChannel,
+  subscribeToChannel,
+  unsubscribeFromChannel,
+};
