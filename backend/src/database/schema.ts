@@ -1,9 +1,17 @@
 import mongoose from "mongoose";
+import { config } from "dotenv";
+import path from "path";
 
-const dburi: string = process.env.MONGO_URI || "mongodb://localhost:27017/real-notif";
+const envPath = path.resolve(__dirname, "../../../.env");
+console.log("Loading env from:", envPath); // optional: for debugging
+config({ path: envPath });
+
+const dburi: string =
+  process.env.MONGO_URI || "mongodb://localhost:27017/real-notif";
 // Database connection
 export const connectDB = async (): Promise<void> => {
   try {
+    console.log(dburi);
     await mongoose.connect(dburi);
     console.log("MongoDB connected successfully");
   } catch (error) {
@@ -11,8 +19,6 @@ export const connectDB = async (): Promise<void> => {
     process.exit(1);
   }
 };
-
-
 
 // User schema
 const userSchema = new mongoose.Schema({

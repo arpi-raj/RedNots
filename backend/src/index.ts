@@ -5,6 +5,12 @@ import { initRedis } from "./config/redis";
 import { connectDB } from "./database/schema";
 import cors from "cors";
 import router from "./routes/publish";
+import { config } from "dotenv";
+import path from "path";
+
+const envPath = path.resolve(__dirname, "../../.env");
+console.log("Loading env from:", envPath); // optional: for debugging
+config({ path: envPath });
 
 const app = express();
 app.use(express.json());
@@ -22,14 +28,16 @@ initRedis().catch((error) => {
   process.exit(1);
 });
 
-connectDB().then(() => {
-  console.log("Connected to MongoDB");
-}).catch((e:Error) => {
-  console.error("Failed to connect to MongoDB:", e);
-  process.exit(1);
-});
+connectDB()
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((e: Error) => {
+    console.error("Failed to connect to MongoDB:", e);
+    process.exit(1);
+  });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
