@@ -2,58 +2,35 @@ import { WebSocketServer, WebSocket } from "ws";
 import { sub } from "../config/redis";
 import { Server } from "http";
 
+// Map each WebSocket client to their set of subscribed channel IDs
 const clients = new Map<WebSocket, Set<string>>();
 
-// upgrade this to static instance
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
 
+  // When a new client connects, initialize their subscription set
   wss.on("connection", (ws: WebSocket) => {
-    let userChannels = new Set<string>();
-
-    ws.on("message", (msg: string) => {
-      try {
-        const data = JSON.parse(msg);
-        if (data.type === "subscribe" && Array.isArray(data.channels)) {
-          userChannels = new Set(data.channels);
-          clients.set(ws, userChannels);
-        }
-        if (data.type === "unsubscribe" && Array.isArray(data.channels)) {
-          data.channels.forEach((channel: string) => {
-            if (userChannels.has(channel)) {
-              userChannels.delete(channel);
-            }
-          });
-          if (userChannels.size === 0) {
-            clients.delete(ws);
-          } else {
-            clients.set(ws, userChannels);
-          }
-        }
-      } catch (err) {
-        console.error("Invalid message format", err);
-      }
-    });
+    clients.set(ws, new Set());
 
     ws.on("close", () => {
       clients.delete(ws);
     });
   });
 
+  // Forward Redis-published messages to subscribed clients
   sub.pSubscribe("*", (message, channel) => {
+    let parsedMessage;
+    try {
+      parsedMessage = JSON.parse(message);
+    } catch {
+      parsedMessage = message;
+    }
+
+    // For each client, check if they're subscribed to this channel
     for (const [ws, channels] of clients.entries()) {
-      if (channels.has(channel)) {
-        ws.send(JSON.stringify({ channel, message }));
+      if (channels.has(channel) && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ channel, ...parsedMessage }));
       }
     }
   });
-
-  sub.unsubscribe("*", (err) => {
-    if (err) {
-      console.error("Error unsubscribing from Redis channels:", err);
-    } else {
-      console.log("Unsubscribed from all Redis channels");
-    }
-  }
-  );
 }

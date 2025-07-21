@@ -4,9 +4,10 @@ import { setupWebSocket } from "./sockets/ws";
 import { initRedis } from "./config/redis";
 import { connectDB } from "./database/schema";
 import cors from "cors";
-import router from "./routes/publish";
 import { config } from "dotenv";
 import path from "path";
+import { channelRouter } from "./routes/channelRoutes";
+import { userRouter } from "./routes/userRoutes";
 
 const envPath = path.resolve(__dirname, "../../.env");
 console.log("Loading env from:", envPath); // optional: for debugging
@@ -15,6 +16,9 @@ config({ path: envPath });
 const app = express();
 app.use(express.json());
 app.use(cors());
+const router = express.Router();
+router.use("/channels", channelRouter);
+router.use("/users", userRouter);
 app.use("/api", router);
 const server = http.createServer(app);
 

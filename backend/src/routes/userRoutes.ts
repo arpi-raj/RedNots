@@ -4,7 +4,7 @@ import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs"; // For password hashing
 //import jwt from "jsonwebtoken"; // For JWT token generation
 
-const userRouter = Router();
+export const userRouter = Router();
 
 interface User {
   id: string;
@@ -20,7 +20,7 @@ const signUp = async (
   email: string
 ): Promise<User> => {
   // Check if user already exists
-  const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+  const existingUser = await User.findOne({ email });
   if (existingUser) throw new Error("User already exists");
 
   const hashedPassword = await bcrypt.hash(password, 10);
