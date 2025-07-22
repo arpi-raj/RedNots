@@ -10,7 +10,7 @@ import { channelRouter } from "./routes/channelRoutes";
 import { userRouter } from "./routes/userRoutes";
 
 const envPath = path.resolve(__dirname, "../../.env");
-console.log("Loading env from:", envPath); // optional: for debugging
+//console.log("Loading env from:", envPath); // optional: for debugging
 config({ path: envPath });
 
 const app = express();

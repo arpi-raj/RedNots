@@ -184,3 +184,33 @@ userRouter.get("/getUser/:id", async (req: Request, res: Response) => {
     res.status(400).json({ error: (error as Error).message });
   }
 });
+
+userRouter.get("/getChannel/:userId", async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  try {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      res.status(400).json({ error: "Invalid user ID" });
+      return;
+    }
+
+    const user = await User.findById(userId)
+      .populate({ path: "subscriptions", select: "name" }) // Populate subscriptions with channel names path mongoSchema select as suggested
+      .populate({ path: "published", select: "name" }); // Populate published with channel names
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const userSubscriptions = user.subscriptions.map((sub: any) => sub.name);
+    const userChannels = user.published.map((channel: any) => channel.name);
+
+    res.status(200).json({
+      userSubscriptions,
+      userChannels
+    });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
