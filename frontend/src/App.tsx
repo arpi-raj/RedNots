@@ -1,6 +1,6 @@
 import "./App.css";
-import Channel from "./components/Channel";
-import Main from "./pages/Main";
+import User from "./components/User";
+import { RecoilRoot } from "recoil";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -14,9 +14,11 @@ function App() {
   return (
     <Router>
       <div>
-        <Routes>
-          <Route path="/main" element={<Main user={user} />} />
-        </Routes>
+        <RecoilRoot>
+          <Routes>
+            <Route path="/home" element={<User />} />
+          </Routes>
+        </RecoilRoot>
       </div>
     </Router>
   );
